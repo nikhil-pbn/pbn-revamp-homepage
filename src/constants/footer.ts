@@ -1,7 +1,7 @@
 import { ANCHORS, PLACEHOLDER_HREF, SITE } from "@/constants/site";
 import type { FilledIconName } from "@/icons";
 
-export type LinkGroup = { title: string; links: string[] };
+type LinkGroup = { title: string; links: string[] };
 
 export const FOOTER_CONTACT = [
   { label: SITE.supportPhone, href: PLACEHOLDER_HREF },

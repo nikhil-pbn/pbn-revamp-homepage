@@ -1,14 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useRef, type ReactNode } from "react";
-import { motion, useInView, useMotionValue, useMotionValueEvent, useScroll } from "framer-motion";
+import { motion, useMotionValue, useMotionValueEvent, useScroll } from "framer-motion";
 
 import { INNOVATION_STACK } from "@/constants/innovations";
 import { useIsMobile, usePrefersReducedMotion } from "@/hooks";
 import { cn } from "@/lib/utils";
 import { clamp01 } from "@/utils/math";
 
-export type StackCardItem = {
+type StackCardItem = {
   id: string;
   /** Variant surface + sticky offset classes. */
   className: string;
@@ -22,17 +22,14 @@ export type StackCardItem = {
  * `p = clamp((a.bottom − b.top) / a.height)`.
  */
 export function StackCards({ cards }: { cards: readonly StackCardItem[] }) {
-  const ref = useRef<HTMLDivElement>(null);
-  // only track scroll while the stack is (nearly) on screen
-  const active = useInView(ref, { margin: INNOVATION_STACK.trackMargin });
   const reduce = usePrefersReducedMotion();
   const isMobile = useIsMobile();
   const stacking = !reduce && !isMobile;
 
   return (
-    <div ref={ref} className="mt-12 flex flex-col gap-7">
+    <div className="mt-12 flex flex-col gap-7">
       {cards.map((card) => (
-        <StackCard key={card.id} variant={card.variant} className={card.className} active={active} stacking={stacking}>
+        <StackCard key={card.id} variant={card.variant} className={card.className} stacking={stacking}>
           {card.content}
         </StackCard>
       ))}
@@ -43,14 +40,12 @@ export function StackCards({ cards }: { cards: readonly StackCardItem[] }) {
 type StackCardProps = {
   variant: string;
   className: string;
-  /** The stack is near the viewport: follow scroll. */
-  active: boolean;
   /** Desktop without reduced motion: apply the scale/dim effect. */
   stacking: boolean;
   children: ReactNode;
 };
 
-function StackCard({ variant, className, active, stacking, children }: StackCardProps) {
+function StackCard({ variant, className, stacking, children }: StackCardProps) {
   const ref = useRef<HTMLElement>(null);
   const { scrollY } = useScroll();
   const scale = useMotionValue(1);
@@ -72,17 +67,14 @@ function StackCard({ variant, className, active, stacking, children }: StackCard
     filter.set(p > 0 ? `brightness(${1 - p * INNOVATION_STACK.dimDrop})` : "none");
   }, [stacking, scale, filter]);
 
-  useMotionValueEvent(scrollY, "change", () => {
-    if (active) update();
-  });
+  useMotionValueEvent(scrollY, "change", update);
 
-  // re-sync when tracking starts, the mode changes or the viewport resizes
+  // sync on mount, when the mode changes and on resize
   useEffect(() => {
-    if (!active) return;
     update();
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
-  }, [active, update]);
+  }, [update]);
 
   return (
     <motion.article

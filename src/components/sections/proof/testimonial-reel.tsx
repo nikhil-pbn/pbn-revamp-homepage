@@ -13,6 +13,8 @@ import { TestimonialCard } from "./testimonial-card";
 const ARROW_CLASS =
   "grid size-11 cursor-pointer place-items-center rounded-full border border-ink bg-white text-ink transition-[background,color,opacity] duration-200 hover:bg-ink hover:text-white focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-brand";
 
+/** Scroll position (px) within which the track counts as at its start/end. */
+const EDGE_TOLERANCE = 4;
 const PROGRESS_EASE = [0.25, 0.1, 0.25, 1] as const;
 
 /**
@@ -39,35 +41,32 @@ export function TestimonialReel() {
   useEffect(() => {
     const t = trackRef.current;
     if (!t) return;
-    let raf = 0;
     const update = () => {
       const { scrollLeft, scrollWidth, clientWidth } = t;
       const max = scrollWidth - clientWidth;
       const progress = max > 0 ? scrollLeft / max : 1;
-      setAtStart(scrollLeft < PROOF_TIMING.edgeTolerance);
-      setAtEnd(scrollLeft >= max - PROOF_TIMING.edgeTolerance);
+      setAtStart(scrollLeft < EDGE_TOLERANCE);
+      setAtEnd(scrollLeft >= max - EDGE_TOLERANCE);
       animate(barPct, PROOF_TIMING.progressMinPct + progress * (100 - PROOF_TIMING.progressMinPct), {
         duration: PROOF_TIMING.progressTweenS,
         ease: PROGRESS_EASE,
       });
     };
-    const schedule = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(update);
-    };
-    const ro = new ResizeObserver(schedule);
+    const ro = new ResizeObserver(update);
     ro.observe(t);
-    t.addEventListener("scroll", schedule, { passive: true });
+    t.addEventListener("scroll", update, { passive: true });
     return () => {
-      cancelAnimationFrame(raf);
       ro.disconnect();
-      t.removeEventListener("scroll", schedule);
+      t.removeEventListener("scroll", update);
     };
   }, [barPct]);
 
+  /** One card plus the track's gap. */
   const step = useCallback(() => {
-    const card = trackRef.current?.firstElementChild;
-    return (card instanceof HTMLElement ? card.offsetWidth : 0) + PROOF_TIMING.cardGap;
+    const t = trackRef.current;
+    const card = t?.firstElementChild;
+    if (!t || !(card instanceof HTMLElement)) return 0;
+    return card.offsetWidth + parseFloat(getComputedStyle(t).columnGap);
   }, []);
 
   // auto-advance by one card while on screen, untouched, not hovered and the tab is visible
@@ -77,7 +76,7 @@ export function TestimonialReel() {
       const t = trackRef.current;
       if (!t || hoverRef.current || document.hidden) return;
       const max = t.scrollWidth - t.clientWidth;
-      if (t.scrollLeft >= max - PROOF_TIMING.edgeTolerance) t.scrollTo({ left: 0 });
+      if (t.scrollLeft >= max - EDGE_TOLERANCE) t.scrollTo({ left: 0 });
       else t.scrollBy({ left: step() });
     }, PROOF_TIMING.autoAdvanceMs);
     return () => clearInterval(id);

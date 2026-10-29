@@ -6,9 +6,9 @@ import type { IconName } from "@/icons";
    Solutions mega menu
    -------------------------------------------------------------------------- */
 
-export type MegaFeature = { title: string; description: string };
+type MegaFeature = { title: string; description: string };
 
-export type MegaSolution = {
+type MegaSolution = {
   avatar: AvatarKey;
   title: string;
   description: string;
@@ -215,7 +215,7 @@ export const MEGA_PROMO = {
    Small dropdown menus
    -------------------------------------------------------------------------- */
 
-export type MenuLink = { title: string; description?: string; icon: IconName };
+type MenuLink = { title: string; description?: string; icon: IconName };
 export type MenuGroup = { title: string; items: MenuLink[] };
 
 /** Icon tile colours, cycled across the items of each small menu. */

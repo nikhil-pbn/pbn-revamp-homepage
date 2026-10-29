@@ -13,11 +13,9 @@ export const INNOVATIONS_HEADING = {
 export const INNOVATION_STACK = {
   scaleDrop: 0.05,
   dimDrop: 0.12,
-  /** Scroll tracking runs only while the stack is within this margin of the viewport. */
-  trackMargin: "200px 0px",
 } as const;
 
-export type InnovationVariant = "lav" | "light" | "dark";
+type InnovationVariant = "lav" | "light" | "dark";
 export type InnovationVisual = "receptionist" | "voice" | "payments" | "ai";
 
 export type Innovation = {

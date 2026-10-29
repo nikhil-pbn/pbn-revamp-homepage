@@ -4,7 +4,7 @@ import type { IconName } from "@/icons";
 
 /** "Say Hello to PbN AI Receptionist!" — copy, CTAs, video and the call-flow diagram. */
 
-export type HeadlineWord = { text: string; accent?: boolean };
+type HeadlineWord = { text: string; accent?: boolean };
 
 export const AI_RECEPTIONIST = {
   titleId: "ai-receptionist-title",

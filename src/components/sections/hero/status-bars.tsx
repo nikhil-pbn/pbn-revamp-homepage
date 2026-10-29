@@ -17,7 +17,7 @@ function FloatingBar({ show, className, children }: { show: boolean; className: 
   return (
     <motion.div
       className={cn(
-        "absolute z-3 flex items-center gap-3 rounded-2xl bg-white px-2.5 py-2.25 whitespace-nowrap shadow-float max-xl:max-w-[calc(100%-28px)]",
+        "absolute z-3 flex items-center gap-3 rounded-2xl bg-white px-2.5 py-2.25 whitespace-nowrap shadow-float max-xl:max-w-[calc(100%-28px)] max-sm:gap-2.5 max-sm:whitespace-normal",
         className,
       )}
       initial={false}
@@ -35,7 +35,7 @@ function AgentAvatar({ scene }: { scene: HeroScene }) {
       avatar={scene.avatar}
       crop="face"
       sizes="48px"
-      className="size-12 rounded-full shadow-agent-avatar"
+      className="size-12 rounded-full shadow-agent-avatar max-sm:size-10"
     />
   );
 }
@@ -47,19 +47,19 @@ export function StatusBars({ scene, working, done }: { scene: HeroScene; working
       <FloatingBar show={working} className="-top-11 -left-12 max-xl:-top-11.5 max-xl:left-2">
         <AgentAvatar scene={scene} />
         <span className="flex min-w-0 flex-col leading-tight">
-          <b className="text-[15px] font-medium tracking-[-0.01em]">{scene.agent}</b>
+          <b className="text-[15px] font-medium tracking-[-0.01em] max-sm:text-sm">{scene.agent}</b>
           <span className="text-xs text-ink-muted max-xl:overflow-hidden max-xl:text-ellipsis">{scene.working}</span>
         </span>
-        <span className="ml-3.5 animate-shimmer rounded-[10px] bg-shimmer px-4.5 py-2 text-[13px] font-medium text-brand">
+        <span className="ml-3.5 flex-none animate-shimmer rounded-[10px] bg-shimmer px-4.5 py-2 text-[13px] font-medium text-brand max-sm:ml-1 max-sm:px-3.5">
           {HERO_BOARD.workingLabel}
         </span>
       </FloatingBar>
       <FloatingBar show={done} className="-bottom-7.5 -left-7.5 max-xl:-bottom-8.5 max-xl:left-3.5">
         <AgentAvatar scene={scene} />
         <span className="flex min-w-0 flex-col leading-tight">
-          <b className="text-[15px] font-medium tracking-[-0.01em]">{scene.done}</b>
+          <b className="text-[15px] font-medium tracking-[-0.01em] max-sm:text-sm">{scene.done}</b>
         </span>
-        <span className="ml-3.5 rounded-[10px] bg-status-done px-4.5 py-2 text-[13px] font-medium text-white">
+        <span className="ml-3.5 flex-none rounded-[10px] bg-status-done px-4.5 py-2 text-[13px] font-medium text-white max-sm:ml-1 max-sm:px-3.5">
           {HERO_BOARD.doneLabel}
         </span>
       </FloatingBar>

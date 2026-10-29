@@ -17,7 +17,7 @@ export const PMS_INTEGRATIONS = {
 } as const;
 
 /** Every supported PMS. The marquee shows the first 13 on row one and the rest on row two. */
-export const PMS_SYSTEMS = [
+const PMS_SYSTEMS = [
   "Dentrix",
   "Dentrix Ascend",
   "Eaglesoft",

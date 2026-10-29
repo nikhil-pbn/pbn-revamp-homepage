@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { animate, motion, useMotionValue, type AnimationPlaybackControls } from "framer-motion";
 
 import { ProductAvatar } from "@/components/common";
-import { HERO_COPY } from "@/constants/hero";
+import { HERO_COPY, HERO_SCENES } from "@/constants/hero";
 import { cn } from "@/lib/utils";
 
 import { useHeroDemo } from "./hero-demo";
@@ -40,19 +40,15 @@ function ChipProgress({ durationMs, paused }: { durationMs: number; paused: bool
 
 /** Row of feature chips: shows which scene is playing, click to jump to one. */
 export function FeatureChips() {
-  const { scenes, index, runId, durationMs, paused, suspended, reduced, play, setChips, onDemoFocus, onDemoBlur } =
-    useHeroDemo();
+  const { index, runId, durationMs, paused, suspended, reduced, play } = useHeroDemo();
 
   return (
     <div
-      ref={setChips}
       role="tablist"
       aria-label={HERO_COPY.chipsLabel}
       className="flex max-w-150 flex-wrap gap-2 max-lg:justify-center"
-      onFocus={onDemoFocus}
-      onBlur={onDemoBlur}
     >
-      {scenes.map((scene, i) => {
+      {HERO_SCENES.map((scene, i) => {
         const on = i === index;
         return (
           <button

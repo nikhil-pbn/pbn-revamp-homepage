@@ -33,8 +33,6 @@ export const CONTEXT_SCENE = {
   mobileDriftY: 48,
   /** Unpinned (mobile) reveal starts when the scene's top is this fraction down the viewport. */
   mobileRevealStart: 0.85,
-  /** Scroll tracking runs only while the scene is within this margin of the viewport. */
-  trackMargin: "200px 0px",
 } as const;
 
 export const CONTEXT_PMS = {

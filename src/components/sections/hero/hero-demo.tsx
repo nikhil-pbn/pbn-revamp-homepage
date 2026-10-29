@@ -28,7 +28,6 @@ const IDLE_PHASE: Phase = { working: false, done: false, member: false, finished
 export type DemoCursorValues = { x: MotionValue<number>; y: MotionValue<number>; opacity: MotionValue<number> };
 
 type HeroDemoValue = {
-  scenes: readonly HeroScene[];
   index: number;
   /** Increments on every play, so replaying the same scene remounts it. */
   runId: number;
@@ -57,11 +56,6 @@ type HeroDemoValue = {
   moveCursor: (el: Element | null | undefined) => void;
   onStageEnter: () => void;
   onStageLeave: () => void;
-  /** Callback ref for the chips row (part of the keyboard-focus pause region). */
-  setChips: (el: HTMLDivElement | null) => void;
-  /** Keyboard focus entering / leaving the chips or the board pauses / resumes like hover. */
-  onDemoFocus: (e: FocusEvent) => void;
-  onDemoBlur: (e: FocusEvent) => void;
 };
 
 const HeroDemoContext = createContext<HeroDemoValue | null>(null);
@@ -91,7 +85,6 @@ export function HeroDemo({ children, ...props }: ComponentProps<"section">) {
   const [clock] = useState(() => new DemoClock());
   const timelineRef = useRef<Timeline | null>(null);
   const stageRef = useRef<HTMLDivElement | null>(null);
-  const chipsRef = useRef<HTMLDivElement | null>(null);
   const cursorTargetRef = useRef<Element | null>(null);
   const cursorX = useMotionValue(0);
   const cursorY = useMotionValue(0);
@@ -100,7 +93,7 @@ export function HeroDemo({ children, ...props }: ComponentProps<"section">) {
   const [run, setRun] = useState({ index: 0, id: 0 });
   const [phase, setPhase] = useState<Phase>(IDLE_PHASE);
   const [hovered, setHovered] = useState(false);
-  /** Keyboard focus is inside the chips or the board (WCAG 2.2.2: lets keyboard users stop the rotation). */
+  /** Keyboard focus is inside the hero (WCAG 2.2.2: lets keyboard users stop the rotation). */
   const [focused, setFocused] = useState(false);
   const paused = hovered || focused;
   /** Counts pointer-leaves since the scene started (each one restarts the resume delay). */
@@ -168,24 +161,19 @@ export function HeroDemo({ children, ...props }: ComponentProps<"section">) {
     [cursorX, cursorY, cursorOpacity],
   );
 
-  // Keep a parked cursor on its target when the board is resized (one measurement per frame at most).
+  // Keep a parked cursor on its target when the board is resized.
   const setStage = useCallback(
     (el: HTMLDivElement | null) => {
       stageRef.current = el;
-      let frame = 0;
       const observer = new ResizeObserver(() => {
-        cancelAnimationFrame(frame);
-        frame = requestAnimationFrame(() => {
-          const target = cursorTargetRef.current;
-          const point = el && target?.isConnected ? cursorPoint(el, target) : null;
-          if (!point) return;
-          cursorX.jump(point.x);
-          cursorY.jump(point.y);
-        });
+        const target = cursorTargetRef.current;
+        const point = el && target?.isConnected ? cursorPoint(el, target) : null;
+        if (!point) return;
+        cursorX.jump(point.x);
+        cursorY.jump(point.y);
       });
       if (el) observer.observe(el);
       return () => {
-        cancelAnimationFrame(frame);
         observer.disconnect();
         stageRef.current = null;
       };
@@ -206,31 +194,21 @@ export function HeroDemo({ children, ...props }: ComponentProps<"section">) {
     if (!focused) resume();
   }, [focused, resume]);
 
-  const setChips = useCallback((el: HTMLDivElement | null) => {
-    chipsRef.current = el;
-  }, []);
-
   // Only keyboard focus pauses (`:focus-visible`): a mouse click on a chip keeps the auto-advance running.
-  const onDemoFocus = useCallback((e: FocusEvent) => {
+  const onFocus = (e: FocusEvent) => {
     if (e.target instanceof Element && e.target.matches(":focus-visible")) setFocused(true);
-  }, []);
+  };
 
-  const onDemoBlur = useCallback(
-    (e: FocusEvent) => {
-      if (!focused) return;
-      const next = e.relatedTarget;
-      if (next instanceof Node && (stageRef.current?.contains(next) || chipsRef.current?.contains(next))) return;
-      setFocused(false);
-      if (!hovered) resume();
-    },
-    [focused, hovered, resume],
-  );
+  const onBlur = (e: FocusEvent<HTMLElement>) => {
+    if (!focused || (e.relatedTarget instanceof Node && e.currentTarget.contains(e.relatedTarget))) return;
+    setFocused(false);
+    if (!hovered) resume();
+  };
 
   const cursor = useMemo(() => ({ x: cursorX, y: cursorY, opacity: cursorOpacity }), [cursorX, cursorY, cursorOpacity]);
 
   const value = useMemo<HeroDemoValue>(
     () => ({
-      scenes: HERO_SCENES,
       index: run.index,
       runId: run.id,
       scene,
@@ -250,9 +228,6 @@ export function HeroDemo({ children, ...props }: ComponentProps<"section">) {
       moveCursor,
       onStageEnter,
       onStageLeave,
-      setChips,
-      onDemoFocus,
-      onDemoBlur,
     }),
     [
       run,
@@ -269,15 +244,12 @@ export function HeroDemo({ children, ...props }: ComponentProps<"section">) {
       moveCursor,
       onStageEnter,
       onStageLeave,
-      setChips,
-      onDemoFocus,
-      onDemoBlur,
     ],
   );
 
   return (
     <HeroDemoContext value={value}>
-      <section ref={sectionRef} {...props}>
+      <section ref={sectionRef} onFocus={onFocus} onBlur={onBlur} {...props}>
         {children}
       </section>
     </HeroDemoContext>

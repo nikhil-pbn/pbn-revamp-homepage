@@ -2,7 +2,7 @@ import type { AvatarKey } from "@/constants/images";
 import { PLACEHOLDER_HREF, SITE } from "@/constants/site";
 import type { IconName } from "@/icons";
 
-export type PlatformKpi = {
+type PlatformKpi = {
   label: string;
   value: string;
   /** Fill of the KPI progress bar, 0–100. */

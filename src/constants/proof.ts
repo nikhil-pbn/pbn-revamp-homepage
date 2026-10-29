@@ -36,10 +36,6 @@ export const PROOF_TIMING = {
   /** Card stagger: delay = (index % staggerGroup) * staggerMs. */
   staggerMs: 70,
   staggerGroup: 6,
-  /** Gap between cards in px (used to compute the scroll step; matches `gap-4`). */
-  cardGap: 16,
-  /** Scroll position (px) within which the track counts as at its start/end. */
-  edgeTolerance: 4,
   /** Reel progress bar: minimum fill (%) and tween to a new position (s). */
   progressMinPct: 15,
   progressTweenS: 0.4,

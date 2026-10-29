@@ -10,10 +10,6 @@ import { cn } from "@/lib/utils";
 
 import { TeamCard } from "./team-card";
 
-/** Matches the track's `gap-5`. */
-const CARD_GAP = 20;
-/** Card width before the track has rendered (matches `w-80`). */
-const FALLBACK_CARD_WIDTH = 320;
 const EDGE_TOLERANCE = 4;
 
 function groupOf(index: number) {
@@ -37,9 +33,12 @@ export function TeamPanel() {
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(false);
 
+  /** One card plus the track's gap. */
   const step = useCallback(() => {
-    const first = trackRef.current?.firstElementChild;
-    return (first instanceof HTMLElement ? first.offsetWidth : FALLBACK_CARD_WIDTH) + CARD_GAP;
+    const trk = trackRef.current;
+    const first = trk?.firstElementChild;
+    if (!trk || !(first instanceof HTMLElement)) return 1;
+    return first.offsetWidth + parseFloat(getComputedStyle(trk).columnGap);
   }, []);
 
   const index = useCallback(() => Math.round((trackRef.current?.scrollLeft ?? 0) / step()), [step]);
@@ -68,19 +67,13 @@ export function TeamPanel() {
   useEffect(() => {
     const trk = trackRef.current;
     if (!trk) return;
-    let raf = 0;
-    const onScroll = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(sync);
-    };
     // the observer also fires once on observe, which does the initial sync
-    const ro = new ResizeObserver(onScroll);
+    const ro = new ResizeObserver(sync);
     ro.observe(trk);
-    trk.addEventListener("scroll", onScroll, { passive: true });
+    trk.addEventListener("scroll", sync, { passive: true });
     return () => {
-      cancelAnimationFrame(raf);
       ro.disconnect();
-      trk.removeEventListener("scroll", onScroll);
+      trk.removeEventListener("scroll", sync);
     };
   }, [sync]);
 

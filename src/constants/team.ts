@@ -14,7 +14,7 @@ export const TEAM_SECTION = {
   learnMore: "Learn More",
 } as const;
 
-export type TeamCardKey = "rec" | "voice" | "prm" | "ops" | "forms" | "pay" | "ba" | "mkt" | "ai";
+type TeamCardKey = "rec" | "voice" | "prm" | "ops" | "forms" | "pay" | "ba" | "mkt" | "ai";
 
 export type TeamCard = {
   key: TeamCardKey;
@@ -29,7 +29,7 @@ export type TeamCard = {
   href: string;
 };
 
-export type TeamGroup = {
+type TeamGroup = {
   title: string;
   text: string;
   cards: readonly TeamCardKey[];

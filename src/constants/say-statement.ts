@@ -2,12 +2,12 @@ import type { FilledIconName, IconName } from "@/icons";
 import { ANCHORS } from "@/constants/site";
 
 /** Marks where the inline icon cluster sits in the statement (it reveals like a word). */
-export const ICON_CLUSTER_TOKEN = { cluster: true } as const;
+const ICON_CLUSTER_TOKEN = { cluster: true } as const;
 
 export type SayToken = string | typeof ICON_CLUSTER_TOKEN;
 
 /** A run of tokens; `nowrap` keeps the run on one line. */
-export type SaySegment = { tokens: readonly SayToken[]; nowrap?: boolean };
+type SaySegment = { tokens: readonly SayToken[]; nowrap?: boolean };
 
 /** A white icon inside a cluster circle: a named or custom-path stroke icon, or a filled icon. */
 export type ClusterIcon =

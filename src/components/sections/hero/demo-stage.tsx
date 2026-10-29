@@ -31,8 +31,6 @@ export function DemoStage() {
     moveCursor,
     onStageEnter,
     onStageLeave,
-    onDemoFocus,
-    onDemoBlur,
   } = useHeroDemo();
 
   return (
@@ -43,8 +41,6 @@ export function DemoStage() {
       className="relative my-10 ml-9 max-xl:my-12 max-xl:ml-0 max-md:mb-10"
       onMouseEnter={onStageEnter}
       onMouseLeave={onStageLeave}
-      onFocus={onDemoFocus}
-      onBlur={onDemoBlur}
     >
       <div className="relative overflow-hidden rounded-[18px] border border-line bg-white text-[12.5px] shadow-board">
         <BoardChrome scene={scene} />

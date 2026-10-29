@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef, type ReactNode } from "react";
 import Image from "next/image";
 import {
   motion,
-  useInView,
   useMotionValue,
   useMotionValueEvent,
   useScroll,
@@ -42,8 +41,6 @@ export function ContextScene({ cards }: { cards: readonly ContextCardItem[] }) {
   const avatarRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const metrics = useRef<Metrics>({ pinTop: 0, pinHeight: 0, mobile: false, navH: 0 });
-  // only follow scroll while the scene is (nearly) on screen
-  const active = useInView(sceneRef, { margin: S.trackMargin });
 
   const zoom = useMotionValue<number>(S.startZoom);
   /** Colour reveal 0..1; the cards' drift follows the same curve. */
@@ -109,9 +106,7 @@ export function ContextScene({ cards }: { cards: readonly ContextCardItem[] }) {
   }, [reduce, zoom, colour]);
 
   const { scrollY } = useScroll();
-  useMotionValueEvent(scrollY, "change", () => {
-    if (active) update();
-  });
+  useMotionValueEvent(scrollY, "change", update);
 
   // Measure on resize only (the scene's size tracks the viewport), never on scroll.
   useEffect(() => {
@@ -126,11 +121,6 @@ export function ContextScene({ cards }: { cards: readonly ContextCardItem[] }) {
     ro.observe(scene);
     return () => ro.disconnect();
   }, [measure, update]);
-
-  // catch up when tracking resumes (e.g. after a jump to an anchor)
-  useEffect(() => {
-    if (active) update();
-  }, [active, update]);
 
   return (
     <div

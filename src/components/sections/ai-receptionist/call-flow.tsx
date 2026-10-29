@@ -114,26 +114,17 @@ export function CallFlow() {
     setGeometry((prev) => (sameGeometry(prev, next) ? prev : next));
   }, []);
 
-  // Re-measure (once per frame at most) whenever the panel or any node changes
-  // size: viewport resizes, web-font swaps, breakpoint changes.
+  // Re-measure whenever the panel or any node changes size (viewport, web fonts, breakpoints).
   useEffect(() => {
     const flow = flowRef.current;
     if (!flow) return;
-    let raf = 0;
-    const schedule = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(build);
-    };
-    const ro = new ResizeObserver(schedule);
+    const ro = new ResizeObserver(build);
     ro.observe(flow);
     for (const id of NODE_IDS) {
       const node = nodeRefs.current[id];
       if (node) ro.observe(node);
     }
-    return () => {
-      cancelAnimationFrame(raf);
-      ro.disconnect();
-    };
+    return () => ro.disconnect();
   }, [build]);
 
   /* move the dot along a path with ease-in-out-quad */

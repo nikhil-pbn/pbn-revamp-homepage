@@ -101,14 +101,16 @@ export function PaymentsScene({ scene, reduced, moveCursor }: SceneProps<Scene>)
                 initial={hasMoved ? { opacity: 0 } : false}
                 animate={leaving === cardIndex ? "out" : hasMoved ? "pop" : "rest"}
               >
-                <b className="flex items-center justify-between gap-1.5 text-xs font-medium max-xl:flex-col max-xl:text-[11px]">
-                  <span className="flex min-w-0 items-center gap-1.75 truncate">
+                <b className="flex items-center justify-between gap-1.5 text-xs font-medium max-xl:flex-col max-xl:gap-0.5 max-xl:text-[11px]">
+                  <span className="flex max-w-full min-w-0 items-center gap-1.75 max-sm:flex-col max-sm:gap-1">
                     <PatientAvatar patient={card.patient} size={22} className="size-5.5 shadow-pav" />
-                    {shortName(card.patient.name)}
+                    <span className="max-w-full truncate">{shortName(card.patient.name)}</span>
                   </span>
-                  <span className="ml-auto flex-none text-xs font-semibold text-ink">{card.amount}</span>
+                  <span className="ml-auto flex-none text-xs font-semibold text-ink max-xl:ml-0">{card.amount}</span>
                 </b>
-                <span className="mt-px block pl-7.25 text-[10.5px] text-ink-muted">{card.method}</span>
+                <span className="mt-px block pl-7.25 text-[10.5px] text-ink-muted max-xl:pl-0 max-xl:text-center">
+                  {card.method}
+                </span>
               </motion.div>
             );
           })}
