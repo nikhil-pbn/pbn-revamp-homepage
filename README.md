@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PbN homepage
 
-## Getting Started
+The Practice by Numbers marketing homepage. Next.js 16 (App Router), React 19, Tailwind CSS v4, shadcn/ui and
+framer-motion. The page is fully static (prerendered at build time).
 
-First, run the development server:
+## Scripts
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+| Command                | What it does                                       |
+| ---------------------- | -------------------------------------------------- |
+| `npm run dev`          | Dev server on http://localhost:3000                |
+| `npm run build`        | Production build                                   |
+| `npm start`            | Serve the production build                         |
+| `npm run check`        | Type-check + lint + format check (run before a PR) |
+| `npm run lint:fix`     | ESLint with autofix (incl. Tailwind class fixes)   |
+| `npm run format`       | Prettier (also sorts Tailwind classes)             |
+
+## Project structure
+
+```
+src/
+  app/              layout, page, globals.css (all design tokens + animations)
+  components/
+    ui/             shadcn/ui primitives (button, dialog, sheet, accordion)
+    common/         shared building blocks (Reveal, ProductAvatar, Orb, CheckList, ArrowLink)
+    layout/         header (mega menu, dropdowns, mobile menu) and footer
+    providers/      MotionProvider (LazyMotion + reduced-motion config)
+    sections/       one folder per homepage section
+  constants/        all copy, data, URLs and image imports — one file per section
+  hooks/            useMediaQuery / usePrefersReducedMotion / useIsMobile, useTimeline
+  icons/            Logo, AiSparkle, <Icon> (stroke paths in paths.ts)
+  fonts/            Poppins via next/font
+  utils/            small pure helpers (math, formatting)
+  lib/utils.ts      cn()
+  assets/images/    photos, testimonials, case studies, illustrations
+  Avatars/          the nine 3D product avatars
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Conventions
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Styling is Tailwind only.** No `style` props, except framer-motion `style` bound to MotionValues for scroll- or
+  pointer-driven values.
+- **No hard-coded colours, shadows or gradients in components.** Every one is a token or `@utility` in
+  `src/app/globals.css`, used as a class (`bg-brand`, `text-ink-soft`, `shadow-card`, `bg-promo-bar`). Keyframe
+  animations live there too (`animate-*`).
+- **No copy, data, image paths or URLs in components.** They live in `src/constants/`. Per-item colours are stored
+  there as complete Tailwind class strings so Tailwind can detect them.
+- **Server Components by default.** `"use client"` only on interactive leaves.
+- **Animations:** looping/decorative = CSS `animate-*`; interactive, sequenced or scroll-linked = framer-motion using
+  the lightweight `m.*` components (the provider runs `LazyMotion` in strict mode, so `motion.*` throws).
+- **Reduced motion:** use `usePrefersReducedMotion()` from `@/hooks` (hydration-safe) rather than framer's
+  `useReducedMotion()` when it affects rendered markup.
+- **Breakpoints are desktop-first:** `max-xl` (<1180), `max-lg` (<1000), `max-md` (<860), `max-sm` (<640),
+  `max-xs` (<560).
+- ESLint enforces canonical Tailwind classes and rejects unknown or conflicting ones; Prettier sorts classes.
